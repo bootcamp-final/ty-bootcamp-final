@@ -1,0 +1,7 @@
+package com.github.buyalsky.shoppingcartservice.repository
+
+import com.github.buyalsky.shoppingcartservice.entity.ProductContainedInCarts
+import org.springframework.data.repository.kotlin.CoroutineCrudRepository
+import org.springframework.data.repository.reactive.ReactiveCrudRepository
+
+interface ProductRepository: CoroutineCrudRepository<ProductContainedInCarts, String>
