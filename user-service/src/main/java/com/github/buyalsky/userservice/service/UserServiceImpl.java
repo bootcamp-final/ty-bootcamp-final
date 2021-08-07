@@ -1,27 +1,26 @@
 package com.github.buyalsky.userservice.service;
 
+import com.github.buyalsky.userservice.dto.ShoppingCartDto;
 import com.github.buyalsky.userservice.dto.UpdateUserDto;
 import com.github.buyalsky.userservice.entity.User;
 import com.github.buyalsky.userservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.persistence.EntityNotFoundException;
-import java.net.URI;
 import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private final RestTemplate restTemplate;
+    private final WebClient webClient;
     private final UserRepository repository;
 
     @Value("${shopping-cart-service.url}")
     private String shoppingCartServiceUrl;
 
-    public UserServiceImpl(RestTemplate restTemplate, UserRepository repository) {
-        this.restTemplate = restTemplate;
+    public UserServiceImpl(WebClient webClient, UserRepository repository) {
+        this.webClient = webClient;
         this.repository = repository;
     }
 
@@ -32,9 +31,9 @@ public class UserServiceImpl implements UserService {
 
     public User createUser(User user) {
         User createdUser = repository.save(user);
+
         String createdUserId = createdUser.getId();
-        restTemplate.postForObject(
-            "http://" + shoppingCartServiceUrl + "/{createdUserId}", String.class, createdUserId);
+        createShoppingCartForGivenUserId(createdUserId);
 
         return user;
     }
@@ -50,6 +49,13 @@ public class UserServiceImpl implements UserService {
 
         User updatedUser = updateUserDto.mapToUser(currentUser.get());
         return repository.save(updatedUser);
+    }
+
+    private void createShoppingCartForGivenUserId(String id) {
+        webClient.post()
+            .uri(String.format("%s/{createdUserId}", shoppingCartServiceUrl), id)
+            .retrieve()
+            .bodyToMono(ShoppingCartDto.class).block();
     }
 
 }
