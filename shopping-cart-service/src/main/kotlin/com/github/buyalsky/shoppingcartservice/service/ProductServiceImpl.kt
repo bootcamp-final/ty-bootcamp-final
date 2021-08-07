@@ -14,16 +14,12 @@ class ProductServiceImpl(
         return productRepository.findById(productId)?: throw ProductNotFoundException(productId)
     }
 
-    override fun updateProductPrice(productId: String, price: Double) {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun getCartsThatFollowProduct(productId: String): Set<String> {
         return findById(productId).cartIdsThatContainProduct
     }
 
-    override fun removeProduct(productId: String) {
-        TODO("Not yet implemented")
+    override suspend fun removeProduct(productId: String) {
+        productRepository.deleteById(productId)
     }
 
     override suspend fun addFollowerToProduct(productId: String, userId: String): ProductContainedInCarts {

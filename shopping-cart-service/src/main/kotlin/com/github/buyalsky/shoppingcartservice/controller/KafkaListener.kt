@@ -2,6 +2,8 @@ package com.github.buyalsky.shoppingcartservice.controller
 
 import com.github.buyalsky.shoppingcartservice.dto.*
 import com.github.buyalsky.shoppingcartservice.service.ProductService
+import com.github.buyalsky.shoppingcartservice.service.client.EmailServiceClient
+import com.github.buyalsky.shoppingcartservice.service.client.UserServiceClient
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -17,15 +19,10 @@ import reactor.core.publisher.Mono
 @Component
 class KafkaListener(
     private val productService: ProductService,
-    private val webClient: WebClient
+    private val userServiceClient: UserServiceClient,
+    private val emailServiceClient: EmailServiceClient
 ): Listener {
-
-    @Value("\${email-service.url}")
-    private lateinit var emailServiceUrl: String
-
-    @Value("\${user-service.url}")
-    private lateinit var userServiceUrl: String
-
+    
     @KafkaListener(topics = ["\${topic.price-change.name}"],
         groupId = "\${group.id}",
         containerFactory = "listenerContainerForPriceChange")
@@ -40,11 +37,7 @@ class KafkaListener(
                 .getCartsThatFollowProduct(productId)
 
             cartsThatFollowProduct.forEach { userId ->
-                val (_, fullName, emailAddress) = webClient.get()
-                    .uri("${userServiceUrl}/{userId}", userId)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .retrieve()
-                    .awaitBody<UserDetailDto>()
+                val (_, fullName, emailAddress) = userServiceClient.getUserDetailById(userId)
 
                 val productPriceChangeEmailDto = ProductPriceChangeEmailDto(
                     productName,
@@ -53,13 +46,7 @@ class KafkaListener(
                     previousPrice,
                     currentPrice
                 )
-
-                webClient.post()
-                    .uri("${emailServiceUrl}/")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .body(BodyInserters.fromValue(productPriceChangeEmailDto))
-                    .retrieve()
-                    .awaitBody<Any>()
+                emailServiceClient.sendProductPriceChangeEvent(productPriceChangeEmailDto)
             }
         }
     }

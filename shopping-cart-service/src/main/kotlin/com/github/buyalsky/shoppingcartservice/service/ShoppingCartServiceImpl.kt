@@ -1,47 +1,43 @@
 package com.github.buyalsky.shoppingcartservice.service
 
 import com.github.buyalsky.shoppingcartservice.controller.ShoppingCartNotFoundException
-import com.github.buyalsky.shoppingcartservice.dto.ProductInfoDto
+import com.github.buyalsky.shoppingcartservice.dto.ShoppingCartDetailDto
 import com.github.buyalsky.shoppingcartservice.entity.ShoppingCart
 import com.github.buyalsky.shoppingcartservice.entity.ShoppingCartItem
 import com.github.buyalsky.shoppingcartservice.repository.ShoppingCartRepository
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.MediaType
+import com.github.buyalsky.shoppingcartservice.service.client.ProductServiceClient
+import com.github.buyalsky.shoppingcartservice.service.client.ShippingCalculationServiceClient
+import com.github.buyalsky.shoppingcartservice.service.client.UserServiceClient
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.awaitBody
 
 @Service
 class ShoppingCartServiceImpl(
     private val repository: ShoppingCartRepository,
     private val productService: ProductService,
-    private val webClient: WebClient
+    private val userServiceClient: UserServiceClient,
+    private val shippingCalculationServiceClient: ShippingCalculationServiceClient,
+    private val productServiceClient: ProductServiceClient
 ): ShoppingCartService {
-    @Value("\${product-service.url}")
-    private lateinit var productServiceUrl: String
 
     override suspend fun findById(id: String) =
         repository.findById(id)?: throw ShoppingCartNotFoundException(id)
 
     override suspend fun findByIdCompleteInfo(id: String): ShoppingCart {
-        val shipping = 5.5
         val (customerId, shoppingCartItems, _) = repository.findById(id)?: throw ShoppingCartNotFoundException(id)
         var subtotal = 0.0
-        val newShoppingCartItems = shoppingCartItems.map {
-            val productInfo = webClient.get()
-                .uri("${productServiceUrl}/{productId}", it.productId)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .awaitBody<ProductInfoDto>()
+        val categories: MutableSet<String> = HashSet()
+        val newShoppingCartItems: MutableList<ShoppingCartItem> = ArrayList()
+        shoppingCartItems.forEach {
+            val productInfo = productServiceClient.getProductInfoById(it.productId)
 
-            ShoppingCartItem(it.productId, it.quantity, productInfo.price)
-        }.toList()
+            newShoppingCartItems.add(ShoppingCartItem(it.productId, it.quantity, productInfo.price))
+            categories.add(productInfo.category)
+        }
 
         newShoppingCartItems.forEach {
             subtotal += it.price*it.quantity
         }
-        println(newShoppingCartItems)
-        println(subtotal)
+        val shipping = getShippingCostForGivenCart(customerId!!, subtotal, categories.toList())
         return ShoppingCart(customerId, newShoppingCartItems, shipping, subtotal, shipping+subtotal)
     }
 
@@ -95,6 +91,15 @@ class ShoppingCartServiceImpl(
         val shoppingCart = findById(customerId)
         shoppingCart.shoppingCartItems.filter { item -> item.productId != productId }
         return repository.save(shoppingCart)
+    }
+
+    internal suspend fun getShippingCostForGivenCart(customerId: String, subtotal: Double, categories: List<String>): Double {
+        val (_, _, _, isEliteMember) = userServiceClient.getUserDetailById(customerId)
+
+        val shippingCostDto = shippingCalculationServiceClient
+            .getShippingCostBasedOnCartDetails(ShoppingCartDetailDto(isEliteMember, subtotal, categories))
+
+        return shippingCostDto.shippingCost
     }
 
 }
