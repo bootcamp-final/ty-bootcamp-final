@@ -9,7 +9,9 @@ services:
       - MONGO_HOST=mongodb-shopping-cart
       - KAFKA_HOST=kafka
     ports:
-      - 8888:8888
+      - "8888"
+    deploy:
+      replicas: 3
     depends_on:
       - mongodb-shopping-cart
       - kafka
@@ -23,7 +25,9 @@ services:
       - MONGO_HOST=mongodb-product
       - KAFKA_HOST=kafka
     ports:
-      - 9090:8080
+      - "9090:8080"
+    deploy:
+      replicas: 1
     depends_on:
       - mongodb-product
       - kafka
@@ -34,12 +38,14 @@ services:
       context: user-service
       dockerfile: Dockerfile
     environment:
-      - POSTGRES_DB=demo
       - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=pass
+      - POSTGRES_PASSWORD=root
       - DB_HOST=postgres
+      - SHOPPING_CART_SERVICE_HOST=shopping-cart:8888
     ports:
-      - 8765:8765
+      - "8765:8765"
+    deploy:
+      replicas: 1
     depends_on:
       - postgres
 
@@ -49,7 +55,9 @@ services:
       context: email-service
       dockerfile: Dockerfile
     ports:
-      - 8123:8123
+      - "8123:8123"
+    deploy:
+      replicas: 1
 
   postgres:
     container_name: postgres
@@ -57,23 +65,23 @@ services:
     environment:
       - POSTGRES_DB=demo
       - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=pass
+      - POSTGRES_PASSWORD=root
     ports:
-      - 5000:5432
+      - "5000:5432"
     volumes:
     - ./pgdata:/var/lib/postgresql/data
 
   mongodb-product:
     image: mongo
     ports:
-      - 37017:27017
+      - "37017:27017"
     volumes:
     - ./db-product-data:/data/db
 
   mongodb-shopping-cart:
     image: mongo
     ports:
-      - 47017:27017
+      - "47017:27017"
     volumes:
     - ./db-shopping-cart-data:/data/db
 
@@ -83,14 +91,14 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - 22181:2181
+      - "22181:2181"
   
   kafka:
     image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
     ports:
-      - 29092:29092
+      - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
