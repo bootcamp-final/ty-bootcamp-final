@@ -1,0 +1,100 @@
+version: '3'
+services:
+  shopping-cart:
+    image: shopping-cart-service
+    build:
+      context: shopping-cart-service
+      dockerfile: Dockerfile
+    environment:
+      - MONGO_HOST=mongodb-shopping-cart
+      - KAFKA_HOST=kafka
+    ports:
+      - 8888:8888
+    depends_on:
+      - mongodb-shopping-cart
+      - kafka
+
+  product:
+    container_name: product-service
+    build:
+      context: product-service
+      dockerfile: Dockerfile
+    environment:
+      - MONGO_HOST=mongodb-product
+      - KAFKA_HOST=kafka
+    ports:
+      - 9090:8080
+    depends_on:
+      - mongodb-product
+      - kafka
+  
+  user:
+    container_name: user-service
+    build:
+      context: user-service
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_DB=demo
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=pass
+      - DB_HOST=postgres
+    ports:
+      - 8765:8765
+    depends_on:
+      - postgres
+
+  email:
+    container_name: email-service
+    build:
+      context: email-service
+      dockerfile: Dockerfile
+    ports:
+      - 8123:8123
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=demo
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=pass
+    ports:
+      - 5000:5432
+    volumes:
+    - ./pgdata:/var/lib/postgresql/data
+
+  mongodb-product:
+    image: mongo
+    ports:
+      - 37017:27017
+    volumes:
+    - ./db-product-data:/data/db
+
+  mongodb-shopping-cart:
+    image: mongo
+    ports:
+      - 47017:27017
+    volumes:
+    - ./db-shopping-cart-data:/data/db
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+  
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
