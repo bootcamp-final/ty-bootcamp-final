@@ -4,7 +4,7 @@ const customRuleset = require("./stubObjects")
 
 test('test total amount above', () => {
   const shoppingCartDetails = {
-    "isEliteCustomer": true,
+    "isEliteMember": true,
     "totalAmount": 151,
     "categories": [],
   }
@@ -15,7 +15,7 @@ test('test total amount above', () => {
 
 test('test total amount below', () => {
   const shoppingCartDetails = {
-    "isEliteCustomer": true,
+    "isEliteMember": true,
     "totalAmount": 49,
     "categories": [],
   }
@@ -38,7 +38,7 @@ test('test elite member', () => {
 
 test('test total shopping cart categories contains all', () => {
   const shoppingCartDetails = {
-    "isEliteCustomer": false,
+    "isEliteMember": false,
     "totalAmount": 51,
     "categories": ["a", "b", "c", "d", "e"],
   }
@@ -49,7 +49,7 @@ test('test total shopping cart categories contains all', () => {
 
 test('test categories contains at least one', () => {
   const shoppingCartDetails = {
-    "isEliteCustomer": false,
+    "isEliteMember": false,
     "totalAmount": 55,
     "categories": ["a", "f", "z"],
   }
@@ -60,7 +60,7 @@ test('test categories contains at least one', () => {
 
 test('test categories does not contains at least one', () => {
   const shoppingCartDetails = {
-    "isEliteCustomer": false,
+    "isEliteMember": false,
     "totalAmount": 55,
     "categories": ["a", "b", "i", "k"],
   }
@@ -71,7 +71,7 @@ test('test categories does not contains at least one', () => {
 
 test('test categories does not contains any', () => {
   const shoppingCartDetails = {
-    "isEliteCustomer": false,
+    "isEliteMember": false,
     "totalAmount": 55,
     "categories": ["i", "j", "k"],
   }
@@ -82,7 +82,7 @@ test('test categories does not contains any', () => {
 
 test('test wildcard rule', () => {
   const shoppingCartDetails = {
-    "isEliteCustomer": false,
+    "isEliteMember": false,
     "totalAmount": 55,
     "categories": ["i", "j", "k", "x"],
   }
