@@ -1,0 +1,26 @@
+[
+  {
+    "rule": ["toplam tutar", "fazla", 100.0],
+    "cost": 0
+  },
+  {
+    "rule": ["sepet ürünlerinden", "herhangi birini içeren", ["giyim", "yaşam", "kozmetik"]],
+    "cost": 0
+  },
+  {
+    "rule": ["elit üyelik", "var"],
+    "cost": 3.9
+  },
+  {
+    "rule": ["toplam tutar", "az", 50.0],
+    "cost": 7.49
+  },
+  {
+    "rule": ["sepet ürünlerinden", "hiçbirini içermeyen", ["elektronik", "araç aksesuar"]],
+    "cost": 8.9
+  },
+  {
+    "rule": ["*"],
+    "cost": 9.9
+  }
+]
