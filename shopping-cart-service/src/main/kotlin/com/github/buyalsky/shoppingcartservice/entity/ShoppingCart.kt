@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document
 data class ShoppingCart(@Id var customerId: String? = null,
                         var shoppingCartItems: List<ShoppingCartItem> = ArrayList(),
-                        @Transient val shipping: Double = 0.0,
+                        @Transient var shipping: Double = 0.0,
                         @Transient var subtotal: Double = 0.0,
                         @Transient var totalAmount: Double = 0.0) {
 
