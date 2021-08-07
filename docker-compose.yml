@@ -59,6 +59,18 @@ services:
     deploy:
       replicas: 1
 
+  shipping-calculation:
+    container_name: shipping-calculation-service
+    build:
+      context: shipping-calculation-service
+      dockerfile: Dockerfile
+    environment:
+      - PORT=7878
+    ports:
+      - "7878"
+    deploy:
+      replicas: 1
+
   postgres:
     container_name: postgres
     image: postgres:latest
