@@ -1,5 +1,11 @@
 ## Ty Bootcamp Final Ödevi - Burak Dursunlar
 
+Projenin ayağa kaldırılması:
+
+```bash
+docker-compose up --build
+```
+
 Proje için 5 mikroservis implement ettim.
 
 #### 1. Shopping Cart Service
