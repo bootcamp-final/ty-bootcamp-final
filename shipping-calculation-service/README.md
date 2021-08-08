@@ -13,7 +13,7 @@ Her bir kural için json objesinde ```rule```  ve ```cost``` değerleri içerir.
 
 ```json
 {
-  "rule": ["toplam tutar", "fazla", 75.0],
+  "rule": ["toplam tutar", "büyüktür", 75.0],
   "cost": 3.0
 }
 ```
@@ -76,7 +76,7 @@ Bunlar: "toplam tutar", "sepet ürünlerinden" ve "elit üyelik".
 Bir sepetteki ürünlerin toplam fiyatını sorgulamak istediğimizde ```rule``` 
 dizisinin ilk elemanını ```toplam tutar``` olarak belirtmemiz gerekir.
 
-```rule``` dizisinin ikinci elemanı ```fazla``` veya ```az``` olabilir.
+```rule``` dizisinin ikinci elemanı ```büyüktür``` veya ```küçüktür``` olabilir.
 
 ```rule``` dizisinin üçüncü elemanı nümerik bir değer olmalıdır.
 
@@ -84,9 +84,9 @@ dizisinin ilk elemanını ```toplam tutar``` olarak belirtmemiz gerekir.
 ##### Örnek
 Aşağıda örnek tanımlamalar ve açıklamaları yer almaktadır (fazla yer tutmaması için cost değerlerini belirtmiyorum):
 ```json
-"rule": ["toplam tutar", "az", 500.0]     => toplam tutar 500'den az ise cost değerini uygula
-"rule": ["toplam tutar", "fazla", 100.0]  => toplam tutar 100'den fazla ise cost değerini uygula
-"rule": ["toplam tutar", "fazla", 25.0]   => toplam tutar 25'den fazla ise cost değerini uygula
+"rule": ["toplam tutar", "küçüktür", 500.0]     => toplam tutar 500'den az ise cost değerini uygula
+"rule": ["toplam tutar", "büyüktür", 100.0]  => toplam tutar 100'den fazla ise cost değerini uygula
+"rule": ["toplam tutar", "büyüktür", 25.0]   => toplam tutar 25'den fazla ise cost değerini uygula
 ```
 
 
@@ -94,8 +94,8 @@ Aşağıda örnek tanımlamalar ve açıklamaları yer almaktadır (fazla yer tu
 Bazı durumlarda kullanıcının sepetindeki ürünlerin kategorilerine göre kampanya uygulamak isteyebiliriz.
 Bu durumda ```rule```dizisinin ilk elemanını ```sepet ürünlerinden``` olarak belirtebiliriz.
 
-```rule``` dizisinin ikinci elemanı ```herhangi birini içeren```, 
-```herhangi birini içermeyen```, ```hepsini içeren``` veya 
+```rule``` dizisinin ikinci elemanı ```en az birini içeren```, 
+```en az birini içermeyen```, ```hepsini içeren``` veya 
 ```hiçbirini içermeyen``` olabilir.
 
 ```rule``` dizisinin üçüncü elemanı bir başka dizi almaktadir. 
@@ -107,14 +107,14 @@ Aşağıda örnek açıklama ve bunlara uygun tanımlamalar yer almaktadır.
 * Sepet ürünlerindeki kategorilerden en az biri
    "giyim" veya "kozmetik" ise cost değerini uygula:
 ```json
-"rule": ["sepet ürünlerinden", "herhangi birini içeren", ["giyim", "kozmetik"]]
+"rule": ["sepet ürünlerinden", "en az birini içeren", ["giyim", "kozmetik"]]
 ```
 
 
 * Sepet ürünlerindeki kategorilerden en az biri
    "giyim" veya "kozmetik" değil ise cost değerini uygula:
 ```json
-"rule": ["sepet ürünlerinden", "herhangi birini içermeyen", ["giyim", "kozmetik"]]
+"rule": ["sepet ürünlerinden", "en az birini içermeyen", ["giyim", "kozmetik"]]
 ```
 
 
@@ -157,11 +157,11 @@ Kullanıcılar elit üye olabilirler. Bu üyeliğe göre kampanya uygulamak iste
 ```json
 [
   {
-    "rule": ["toplam tutar", "fazla", 100.0],
+    "rule": ["toplam tutar", "büyüktür", 100.0],
     "cost": 0
   },
   {
-    "rule": ["sepet ürünlerinden", "herhangi birini içeren", ["giyim", "yaşam", "kozmetik"]],
+    "rule": ["sepet ürünlerinden", "en az birini içeren", ["giyim", "yaşam", "kozmetik"]],
     "cost": 0
   },
   {
@@ -169,7 +169,7 @@ Kullanıcılar elit üye olabilirler. Bu üyeliğe göre kampanya uygulamak iste
     "cost": 3.9
   },
   {
-    "rule": ["toplam tutar", "az", 50.0],
+    "rule": ["toplam tutar", "küçüktür", 50.0],
     "cost": 7.49
   },
   {

@@ -1,10 +1,10 @@
 const customRuleset = [
   {
-    "rule": ["toplam tutar", "fazla", 150.0],
+    "rule": ["toplam tutar", "büyüktür", 150.0],
     "cost": 1
   },
   {
-    "rule": ["toplam tutar", "az", 50.0],
+    "rule": ["toplam tutar", "küçüktür", 50.0],
     "cost": 2
   },
   {
@@ -16,11 +16,11 @@ const customRuleset = [
     "cost": 4
   },
   {
-    "rule": ["sepet ürünlerinden", "herhangi birini içeren", ["e", "f", "g"]],
+    "rule": ["sepet ürünlerinden", "en az birini içeren", ["e", "f", "g"]],
     "cost": 5
   },
   {
-    "rule": ["sepet ürünlerinden", "herhangi birini içermeyen", ["i", "j", "k"]],
+    "rule": ["sepet ürünlerinden", "en az birini içermeyen", ["i", "j", "k"]],
     "cost": 6
   },
   {

@@ -37,8 +37,10 @@ function doesMatch(rule, shoppingCartDetails) {
       return conditionFunc(fourth, shoppingCartDetails.categories)
     case "elit üyelik":
       return eliteMembershipFunc(third, shoppingCartDetails.isEliteMember)
-    default:
+    case "*":
       return true
+    default:
+      return false
   }
 }
 
@@ -50,13 +52,13 @@ const eliteMembershipFunc = function (exists, isEliteMember) {
 }
 
 const totalAmountConditionFunctions = {
-  "fazla": (requiredAmount, shoppingCartAmount) => shoppingCartAmount > requiredAmount,
-  "az": (requiredAmount, shoppingCartAmount) => shoppingCartAmount < requiredAmount,
+  "büyüktür": (requiredAmount, shoppingCartAmount) => shoppingCartAmount > requiredAmount,
+  "küçüktür": (requiredAmount, shoppingCartAmount) => shoppingCartAmount < requiredAmount,
 }
 
 const categoryConditionFunctions = {
-  "herhangi birini içeren": containsAtLeastOne,
-  "herhangi birini içermeyen": doesNotContainsAtLeastOne,
+  "en az birini içeren": containsAtLeastOne,
+  "en az birini içermeyen": doesNotContainsAtLeastOne,
   "hepsini içeren": containsAll,
   "hiçbirini içermeyen": doesNotContainsAny
 }
