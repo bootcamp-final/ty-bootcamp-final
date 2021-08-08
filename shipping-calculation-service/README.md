@@ -1,4 +1,4 @@
-## Kargo hesaplama servisi
+# Kargo hesaplama servisi
 
 Bu servisin amacı kullanıcıların sepetlerindeki ürünleri satın 
 alma sırasında ödemeleri gereken kargo ücretini hesaplamaktır.
@@ -61,7 +61,7 @@ Wildcard kuralların  ```rule``` dizisi ```["*"]``` değerine sahip olmalıdır.
 
 Kural dizimizde 1 tane wildcard kural bulunmalı ve en yüksek ```cost``` değerine sahip olan kural olmalıdır.
 
-### Kural tanımlama
+## Kural tanımlama
 Obje içerisindeki ```rule``` değerine bir dizi veriyoruz. Dizimiz en fazla 3 uzunluğunda olabilir.
 
 Bu dizinin:
@@ -72,7 +72,7 @@ Bu dizinin:
 İlk elemanda kullanabileceğimiz sepet bilgisi 3 farklı değer alabilir. 
 Bunlar: "toplam tutar", "sepet ürünlerinden" ve "elit üyelik".
 
-#### 1. Toplam sepet tutarına göre kural belirtme
+### 1. Toplam sepet tutarına göre kural belirtme
 Bir sepetteki ürünlerin toplam fiyatını sorgulamak istediğimizde ```rule``` 
 dizisinin ilk elemanını ```toplam tutar``` olarak belirtmemiz gerekir.
 
@@ -81,16 +81,16 @@ dizisinin ilk elemanını ```toplam tutar``` olarak belirtmemiz gerekir.
 ```rule``` dizisinin üçüncü elemanı nümerik bir değer olmalıdır.
 
 
-##### Örnek
+#### Örnek
 Aşağıda örnek tanımlamalar ve açıklamaları yer almaktadır (fazla yer tutmaması için cost değerlerini belirtmiyorum):
 ```json
-"rule": ["toplam tutar", "küçüktür", 500.0]     => toplam tutar 500'den az ise cost değerini uygula
+"rule": ["toplam tutar", "küçüktür", 500.0]  => toplam tutar 500'den az ise cost değerini uygula
 "rule": ["toplam tutar", "büyüktür", 100.0]  => toplam tutar 100'den fazla ise cost değerini uygula
 "rule": ["toplam tutar", "büyüktür", 25.0]   => toplam tutar 25'den fazla ise cost değerini uygula
 ```
 
 
-#### 2. Sepet ürün kategorilerine göre kural belirtme
+### 2. Sepet ürün kategorilerine göre kural belirtme
 Bazı durumlarda kullanıcının sepetindeki ürünlerin kategorilerine göre kampanya uygulamak isteyebiliriz.
 Bu durumda ```rule```dizisinin ilk elemanını ```sepet ürünlerinden``` olarak belirtebiliriz.
 
@@ -101,7 +101,7 @@ Bu durumda ```rule```dizisinin ilk elemanını ```sepet ürünlerinden``` olarak
 ```rule``` dizisinin üçüncü elemanı bir başka dizi almaktadir. 
 Bu dizide koşulumuzun bir parçası olan kategorileri belirtmekteyiz.
 
-##### Örnek
+#### Örnek
 Aşağıda örnek açıklama ve bunlara uygun tanımlamalar yer almaktadır. 
 
 * Sepet ürünlerindeki kategorilerden en az biri
@@ -131,7 +131,7 @@ Aşağıda örnek açıklama ve bunlara uygun tanımlamalar yer almaktadır.
 "rule": ["sepet ürünlerinden", "hiçbirini içermeyen", ["giyim", "kozmetik"]]
 ```
 
-#### 3. Elit üyeliğe göre kural tanımlama
+### 3. Elit üyeliğe göre kural tanımlama
 
 Kullanıcılar elit üye olabilirler. Bu üyeliğe göre kampanya uygulamak istediğimizde 
 ```rule``` dizisinin ilk elemanını ```elit üyelik```  olarak belirtiyoruz.
@@ -140,7 +140,7 @@ Kullanıcılar elit üye olabilirler. Bu üyeliğe göre kampanya uygulamak iste
 
 Üçüncü bir eleman belirtmemize gerek yok.
 
-##### Örnek
+#### Örnek
 * Elit üyelik olduğu durumda cost değerini uygula:
 ```json
 "rule": ["elit üyelik", "var"]
@@ -151,7 +151,7 @@ Kullanıcılar elit üye olabilirler. Bu üyeliğe göre kampanya uygulamak iste
 "rule": ["elit üyelik", "yok"]
 ```
 
-### Bringing all together
+## Bringing all together
 Şimdi tüm öğrendiklerimizi toparlamamıza katkı sağlayacak bir örnek inceleyelim:
 
 ```json
@@ -191,7 +191,7 @@ Yukarıdaki konfigürasyon dosyasına göre:
 * Yukarıdaki koşullar sağlanamıyorsa ancak sepetteki ürünlerin hiçbiri "elektronik" veya "araç aksesuar" kategorisinden değil ise 8.9 kargo ücreti uygulanacaktır.
 * Yukarıdaki koşullar sağlanamıyorsa varsayılan kargo ücreti olan 9.9 uygulanacaktır.
 
-##### İyileştirmek için neler yapılabilir?
+## İyileştirmek için neler yapılabilirdi?
 Kurallar ilgili konfigurasyon dosyası kullanılarak kod üzerinde değişiklik gerektirmeden değiştirilebilir.
 Ancak ilgili dosya proje içerisinde olduğu için her konfigurasyon değişikliği sırasında yeni deployment yapılması gerekecektir.
 Bu sebeple konfigurasyon dosyasını uzaktan okuyacak şekilde (örn. google sheets sayfasından) düzenlenebilir.
