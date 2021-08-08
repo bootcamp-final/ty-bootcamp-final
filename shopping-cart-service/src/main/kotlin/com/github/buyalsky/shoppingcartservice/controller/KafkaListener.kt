@@ -22,7 +22,7 @@ class KafkaListener(
     private val userServiceClient: UserServiceClient,
     private val emailServiceClient: EmailServiceClient
 ): Listener {
-    
+
     @KafkaListener(topics = ["\${topic.price-change.name}"],
         groupId = "\${group.id}",
         containerFactory = "listenerContainerForPriceChange")

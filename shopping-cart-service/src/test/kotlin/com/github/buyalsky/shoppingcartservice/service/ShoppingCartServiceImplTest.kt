@@ -1,24 +1,26 @@
 package com.github.buyalsky.shoppingcartservice.service
 
 import com.github.buyalsky.shoppingcartservice.controller.Listener
-import com.github.buyalsky.shoppingcartservice.dto.ProductPriceChangeDto
-import com.github.buyalsky.shoppingcartservice.dto.ProductStockChangeDto
+import com.github.buyalsky.shoppingcartservice.dto.*
 import com.github.buyalsky.shoppingcartservice.entity.ShoppingCart
+import com.github.buyalsky.shoppingcartservice.entity.ShoppingCartItem
 import com.github.buyalsky.shoppingcartservice.repository.ShoppingCartRepository
+import com.github.buyalsky.shoppingcartservice.service.client.ProductServiceClient
+import com.github.buyalsky.shoppingcartservice.service.client.ShippingCalculationServiceClient
+import com.github.buyalsky.shoppingcartservice.service.client.UserServiceClient
 import kotlinx.coroutines.runBlocking
 import org.apache.kafka.clients.producer.Producer
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
-import org.mockito.invocation.InvocationOnMock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.kafka.test.EmbeddedKafkaBroker
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.annotation.DirtiesContext
-import org.springframework.web.reactive.function.client.WebClient
 
 @DirtiesContext
 @EmbeddedKafka(topics = ["test-price-change", "test-stock-change"])
@@ -35,8 +37,10 @@ internal class ShoppingCartServiceImplTest {
     private lateinit var kafkaListener: Listener
 
     private lateinit var repository: ShoppingCartRepository
-
     private lateinit var productService: ProductService
+    private lateinit var userServiceClient: UserServiceClient
+    private lateinit var shippingCalculationServiceClient: ShippingCalculationServiceClient
+    private lateinit var productServiceClient: ProductServiceClient
 
     private lateinit var shoppingCartService: ShoppingCartService
 
@@ -44,9 +48,12 @@ internal class ShoppingCartServiceImplTest {
     fun setup(kafkaBroker: EmbeddedKafkaBroker) {
         repository = Mockito.mock(ShoppingCartRepository::class.java)
         kafkaListener = Mockito.mock(Listener::class.java)
-        val webClientMock = Mockito.mock(WebClient::class.java)
         productService = Mockito.mock(ProductService::class.java)
-        shoppingCartService = ShoppingCartServiceImpl(repository, productService, webClientMock)
+        userServiceClient = Mockito.mock(UserServiceClient::class.java)
+        shippingCalculationServiceClient = Mockito.mock(ShippingCalculationServiceClient::class.java)
+        productServiceClient = Mockito.mock(ProductServiceClient::class.java)
+        shoppingCartService = ShoppingCartServiceImpl(repository,
+            productService, userServiceClient, shippingCalculationServiceClient, productServiceClient)
     }
 
     @Test
@@ -63,6 +70,37 @@ internal class ShoppingCartServiceImplTest {
 
             //then
             assertEquals(savedCart, foundCart)
+        }
+    }
+
+    @Test
+    fun findByIdCompleteInfo() {
+        runBlocking {
+            val customerId = "An_id"
+            val productId = "an id"
+
+            val productInfoDto = ProductInfoDto(productId, "a product", "a category", 5.5, 10)
+            val shoppingCartItem = ShoppingCartItem(productId, 5, 5.5)
+
+
+            Mockito.`when`(repository.findById(customerId))
+                .thenReturn(ShoppingCart(customerId, listOf(shoppingCartItem)))
+
+            Mockito.`when`(productServiceClient.getProductInfoById(productId))
+                .thenReturn(productInfoDto)
+
+
+            Mockito.`when`(shippingCalculationServiceClient
+                .getShippingCostBasedOnCartDetails(anyObject()))
+                .thenReturn(ShippingCostDto(3.4))
+
+            Mockito.`when`(userServiceClient.getUserDetailById(customerId))
+                .thenReturn(UserDetailDto(customerId, "a name", "an email", true))
+
+            val shoppingCartExpected = ShoppingCart(customerId, listOf(shoppingCartItem), 3.4, 5 * 5.5, 5 * 5.5 + 3.4)
+
+            val shoppingCartFound = shoppingCartService.findByIdCompleteInfo(customerId)
+            assertEquals(shoppingCartExpected, shoppingCartFound)
         }
     }
 
@@ -115,6 +153,8 @@ internal class ShoppingCartServiceImplTest {
 
     @Test
     fun addProductToShoppingCart() {
+
+
     }
 
     @Test
@@ -124,4 +164,10 @@ internal class ShoppingCartServiceImplTest {
     @Test
     fun removeItemFromCart() {
     }
+
+    private fun <T> anyObject(): T {
+        return Mockito.anyObject<T>()
+    }
+
+
 }

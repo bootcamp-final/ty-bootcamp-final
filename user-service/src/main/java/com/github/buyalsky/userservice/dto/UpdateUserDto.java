@@ -12,13 +12,20 @@ public class UpdateUserDto {
     private final String address;
     private final String emailAddress;
     private final Gender gender;
+    private final Boolean isEliteMember;
 
-    public UpdateUserDto(String fullName, Date birthDay, String address, String emailAddress, Gender gender) {
+    public UpdateUserDto(String fullName,
+                         Date birthDay,
+                         String address,
+                         String emailAddress,
+                         Gender gender,
+                         Boolean isEliteMember) {
         this.fullName = fullName;
         this.birthDay = birthDay;
         this.address = address;
         this.emailAddress = emailAddress;
         this.gender = gender;
+        this.isEliteMember = isEliteMember;
     }
 
     public User mapToUser(User user) {
@@ -32,6 +39,8 @@ public class UpdateUserDto {
             user.setEmailAddress(this.emailAddress);
         if (this.gender != null)
             user.setGender(this.gender);
+        if (this.isEliteMember != null)
+            user.setEliteMember(this.isEliteMember);
 
         return user;
     }
@@ -61,12 +70,12 @@ public class UpdateUserDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UpdateUserDto that = (UpdateUserDto) o;
-        return Objects.equals(fullName, that.fullName) && Objects.equals(birthDay, that.birthDay) && Objects.equals(address, that.address) && Objects.equals(emailAddress, that.emailAddress) && gender == that.gender;
+        return Objects.equals(fullName, that.fullName) && Objects.equals(birthDay, that.birthDay) && Objects.equals(address, that.address) && Objects.equals(emailAddress, that.emailAddress) && gender == that.gender && Objects.equals(isEliteMember, that.isEliteMember);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fullName, birthDay, address, emailAddress, gender);
+        return Objects.hash(fullName, birthDay, address, emailAddress, gender, isEliteMember);
     }
 
     public static class Builder {
@@ -75,6 +84,7 @@ public class UpdateUserDto {
         private String address;
         private String emailAddress;
         private Gender gender;
+        private Boolean isEliteMember;
 
         public Builder fullName(String fullName) {
             this.fullName = fullName;
@@ -101,8 +111,13 @@ public class UpdateUserDto {
             return this;
         }
 
+        public Builder isEliteMember(Boolean isEliteMember) {
+            this.isEliteMember = isEliteMember;
+            return this;
+        }
+
         public UpdateUserDto build() {
-            return new UpdateUserDto(fullName, birthDay, address, emailAddress, gender);
+            return new UpdateUserDto(fullName, birthDay, address, emailAddress, gender, isEliteMember);
         }
     }
 

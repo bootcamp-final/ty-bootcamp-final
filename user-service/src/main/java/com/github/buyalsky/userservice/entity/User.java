@@ -27,6 +27,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    private boolean isEliteMember;
+
     public String getId() {
         return id;
     }
@@ -73,5 +75,13 @@ public class User {
 
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
+    public boolean isEliteMember() {
+        return isEliteMember;
+    }
+
+    public void setEliteMember(boolean eliteMember) {
+        isEliteMember = eliteMember;
     }
 }
